@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Banking System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            /* More rounded corners */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 2.5rem;
+            /* Increased padding */
+            width: 100%;
+            max-width: 800px;
+            /* Max width for larger screens */
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel {
+            display: none;
+            /* Hidden by default */
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #334155;
+            /* Darker text for labels */
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            /* Light border */
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #6366f1;
+            /* Indigo focus border */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            /* Focus ring */
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            /* Slightly more rounded buttons */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Admin/Default Button Styles */
+        .btn-primary {
+            background-color: #6366f1;
+            /* Indigo */
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: #4f46e5;
+            /* Darker indigo */
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            /* Light gray */
+            color: #475569;
+            /* Slate gray */
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+            /* Darker light gray */
+            transform: translateY(-1px);
+        }
+
+        /* Admin-Controlled User Action Button Styles */
+        .btn-admin-user-action-primary {
+            background-color: #0ea5e9;
+            /* Sky Blue */
+            color: #ffffff;
+        }
+
+        .btn-admin-user-action-primary:hover {
+            background-color: #0284c7;
+            /* Darker Sky Blue */
+            transform: translateY(-1px);
+        }
+
+        .message-box {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            font-weight: 500;
+        }
+
+        .message-box.success {
+            background-color: #d1fae5;
+            /* Light green */
+            color: #065f46;
+            /* Dark green */
+        }
+
+        .message-box.error {
+            background-color: #fee2e2;
+            /* Light red */
+            color: #991b1b;
+            /* Dark red */
+        }
+
+        .message-box.info {
+            background-color: #e0f2fe;
+            /* Light blue */
+            color: #0369a1;
+            /* Dark blue */
+        }
+
+        /* Admin-Controlled User Action Message Box Styles */
+        .message-box.admin-user-action-success {
+            background-color: #e0f7fa;
+            /* Very light cyan */
+            color: #00838f;
+            /* Dark cyan */
+        }
+
+        .message-box.admin-user-action-error {
+            background-color: #ffebee;
+            /* Very light red */
+            color: #c62828;
+            /* Dark red */
+        }
+
+        .message-box.admin-user-action-info {
+            background-color: #e3f2fd;
+            /* Very light blue */
+            color: #1565c0;
+            /* Dark blue */
+        }
+
+
+        .list-output {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            color: #334155;
+        }
+
+        .list-output p {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .list-output p:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+            /* Space between icon and text */
+        }
+
+        #loading-indicator {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #6366f1;
+        }
+
+        /* Section for Admin-controlled User Actions */
+        .admin-user-actions-section {
+            background-color: #f0f8ff;
+            /* Very light blue background */
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid #e0f2f7;
+            box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-6">Smart Banking System</h1>
+
+        <!-- Main Menu Panel -->
+        <div id="main-menu-panel" class="panel active text-center">
+            <h2 class="text-2xl font-bold text-gray-700 mb-6">Welcome! Choose your role:</h2>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button id="admin-login-btn" class="btn btn-primary"><i class="fas fa-user-shield"></i> Admin</button>
+                <button id="exit-btn" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Exit</button>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="panel">
+            <h2 class="text-2xl font-bold text-gray-700 mb-6 text-center">Admin Panel</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="admin-create-account-btn" class="btn btn-primary">Create Account</button>
+                <button id="admin-delete-account-btn" class="btn btn-primary">Delete Account</button>
+                <button id="admin-list-accounts-btn" class="btn btn-primary">List Accounts</button>
+                <button id="admin-total-balance-btn" class="btn btn-primary">Total Bank Balance</button>
+                <button id="admin-total-loans-btn" class="btn btn-primary">Total Loans Taken</button>
+                <button id="admin-toggle-loan-btn" class="btn btn-primary">Enable/Disable Loans</button>
+                <button id="admin-bankrupt-btn" class="btn btn-primary">Declare Bankrupt</button>
+            </div>
+
+            <!-- New Section for Admin-controlled User Actions -->
+            <div class="admin-user-actions-section mt-6">
+                <h3 class="text-xl font-bold text-gray-700 mb-4 text-center">User Account Management (Admin)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="admin-deposit-btn" class="btn btn-admin-user-action-primary">Deposit Funds
+                        (User)</button>
+                    <button id="admin-withdraw-btn" class="btn btn-admin-user-action-primary">Withdraw Funds
+                        (User)</button>
+                    <button id="admin-check-balance-btn" class="btn btn-admin-user-action-primary">Check Balance
+                        (User)</button>
+                    <button id="admin-transaction-history-btn" class="btn btn-admin-user-action-primary">Transaction
+                        History (User)</button>
+                    <button id="admin-take-loan-btn" class="btn btn-admin-user-action-primary">Take Loan (User)</button>
+                    <button id="admin-transfer-btn" class="btn btn-admin-user-action-primary">Transfer Funds
+                        (User)</button>
+                </div>
+            </div>
+
+            <button id="admin-back-btn" class="btn btn-secondary w-full mt-6">Back to Main Menu</button>
+            <div id="admin-message-box" class="message-box hidden"></div>
+            <div id="admin-output-area" class="list-output hidden"></div>
+        </div>
+
+        <!-- Modals for input/confirmation -->
+        <div id="modal-backdrop"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-4"></h3>
+                <div id="modal-content">
+                    <!-- Dynamic content will be injected here -->
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+                    <button id="modal-confirm-btn" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+        <div id="loading-indicator">Loading...</div>
+
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+
+        // --- Firebase Configuration (UPDATED WITH YOUR PROVIDED VALUES) ---
+        const FIREBASE_API_KEY = "AIzaSyBh01fZEolTgq6cQcBi_MA7vNMAb8M55Ag";
+        const FIREBASE_AUTH_DOMAIN = "bank-3c144.firebaseapp.com";
+        const FIREBASE_PROJECT_ID = "bank-3c144";
+        const FIREBASE_STORAGE_BUCKET = "bank-3c144.firebasestorage.app";
+        const FIREBASE_MESSAGING_SENDER_ID = "943512847706";
+        const FIREBASE_APP_ID = "1:943512847706:web:0ccf4629eff8761bac1f63";
+        const FIREBASE_MEASUREMENT_ID = "G-82BXBFFYYN";
+
+        // This `appId` is used for Firestore collection paths.
+        const appId = FIREBASE_APP_ID;
+
+        const firebaseConfig = {
+            apiKey: FIREBASE_API_KEY,
+            authDomain: FIREBASE_AUTH_DOMAIN,
+            projectId: FIREBASE_PROJECT_ID,
+            storageBucket: FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+            appId: FIREBASE_APP_ID,
+            measurementId: FIREBASE_MEASUREMENT_ID
+        };
+        // --- END Firebase Configuration ---
+
+        let app, db, auth, userId = null;
+        let isAuthReady = false; // Flag to ensure Firestore operations wait for auth
+        let analytics; // Declare analytics variable
+
+        // --- Utility Functions for UI ---
+        function getElement(id) {
+            return document.getElementById(id);
+        }
+
+        function showLoading() {
+            getElement('loading-indicator').style.display = 'block';
+        }
+
+        function hideLoading() {
+            getElement('loading-indicator').style.display = 'none';
+        }
+
+        function showPanel(panelId) {
+            const panels = document.querySelectorAll('.panel');
+            panels.forEach(panel => panel.classList.remove('active'));
+            getElement(panelId).classList.add('active');
+            // Clear messages and outputs when switching panels
+            getElement('admin-message-box').classList.add('hidden');
+            getElement('admin-output-area').classList.add('hidden');
+            getElement('admin-output-area').innerHTML = '';
+        }
+
+        function displayMessage(message, type, targetBoxId) {
+            const msgBox = getElement(targetBoxId);
+            msgBox.textContent = message;
+            // Determine the correct class based on type and target
+            let className = 'message-box';
+            if (type === 'success') {
+                className += (targetBoxId === 'admin-message-box' ? ' success' : ' admin-user-action-success');
+            } else if (type === 'error') {
+                className += (targetBoxId === 'admin-message-box' ? ' error' : ' admin-user-action-error');
+            } else if (type === 'info') {
+                className += (targetBoxId === 'admin-message-box' ? ' info' : ' admin-user-action-info');
+            }
+            msgBox.className = className; // Set classes
+            msgBox.classList.remove('hidden');
+            // Hide after 5 seconds
+            setTimeout(() => {
+                msgBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        function displayListOutput(items, targetAreaId) {
+            const outputArea = getElement(targetAreaId);
+            outputArea.innerHTML = ''; // Clear previous content
+            if (items.length === 0) {
+                outputArea.innerHTML = '<p class="text-gray-500">No data available.</p>';
+            } else {
+                items.forEach(item => {
+                    const p = document.createElement('p');
+                    p.textContent = item;
+                    outputArea.appendChild(p);
+                });
+            }
+            outputArea.classList.remove('hidden');
+        }
+
+        function showModal(title, contentHtml, onConfirm, onCancel = null) {
+            const modalBackdrop = getElement('modal-backdrop');
+            const modalTitle = getElement('modal-title');
+            const modalContent = getElement('modal-content');
+            const modalConfirmBtn = getElement('modal-confirm-btn');
+            const modalCancelBtn = getElement('modal-cancel-btn');
+
+            modalTitle.textContent = title;
+            modalContent.innerHTML = contentHtml;
+            modalBackdrop.classList.remove('hidden');
+
+            modalConfirmBtn.onclick = () => {
+                modalBackdrop.classList.add('hidden');
+                onConfirm();
+            };
+
+            modalCancelBtn.onclick = () => {
+                modalBackdrop.classList.add('hidden');
+                if (onCancel) onCancel();
+            };
+        }
+
+        function hideModal() {
+            getElement('modal-backdrop').classList.add('hidden');
+        }
+
+        // Helper function for exponential backoff retries
+        async function retryOperation(operation, maxRetries = 5, delay = 1000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    return await operation();
+                } catch (error) {
+                    // Retry on network-related errors (e.g., 'unavailable', 'internal', 'offline')
+                    if (error.code === 'unavailable' || error.code === 'internal' || error.message.includes('offline')) {
+                        console.warn(`Retry attempt ${i + 1}/${maxRetries} due to network error: ${error.message}`);
+                        await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+                    } else {
+                        throw error; // Re-throw other errors immediately
+                    }
+                }
+            }
+            throw new Error(`Operation failed after ${maxRetries} retries.`);
+        }
+
+        // --- Bank Management System Logic (Adapted from Python) ---
+
+        class Account {
+            constructor(name, email, address, accountType, password, initialBalance = 0) { // Added initialBalance
+                this.name = name;
+                this.email = email;
+                this.address = address;
+                this.accountType = accountType; // Saving & Current
+                this.balance = initialBalance; // Set initial balance
+                this.accountNumber = name + email; // generated automatically
+                this.password = password; // Store password
+                this.transactions = []; // Store transaction history
+                this.loanCount = 0;
+                if (initialBalance > 0) {
+                    this.transactions.push(`Initial Deposit: $${initialBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+                }
+            }
+
+            // Method to convert Account object to a plain object for Firestore
+            toFirestore() {
+                return {
+                    name: this.name,
+                    email: this.email,
+                    address: this.address,
+                    accountType: this.accountType,
+                    balance: this.balance,
+                    accountNumber: this.accountNumber,
+                    password: this.password,
+                    transactions: JSON.stringify(this.transactions), // Stringify array
+                    loanCount: this.loanCount
+                };
+            }
+
+            // Static method to create Account object from Firestore data
+            static fromFirestore(data) {
+                const account = new Account(data.name, data.email, data.address, data.accountType, data.password);
+                account.balance = data.balance;
+                account.accountNumber = data.accountNumber;
+                account.transactions = JSON.parse(data.transactions || '[]'); // Parse array
+                account.loanCount = data.loanCount;
+                return account;
+            }
+
+            deposit(amount) {
+                if (amount <= 0) {
+                    return { success: false, message: "Deposit amount must be positive." };
+                }
+                this.balance += amount;
+                this.transactions.push(`Deposited: $${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+                return { success: true, message: `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Deposited Successfully.` };
+            }
+
+            withdraw(amount, isBankrupt) {
+                if (isBankrupt) {
+                    return { success: false, message: "The bank is bankrupt. Withdrawal not possible." };
+                }
+                if (amount <= 0) {
+                    return { success: false, message: "Withdrawal amount must be positive." };
+                }
+                if (amount > this.balance) {
+                    return { success: false, message: "Withdrawal Amount Exceeded. Insufficient balance." };
+                } else {
+                    this.balance -= amount;
+                    this.transactions.push(`Withdrew: $${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+                    return { success: true, message: `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Withdrawn Successfully.` };
+                }
+            }
+
+            checkBalance() {
+                return `Available Balance: $${this.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+
+            transactionHistory() {
+                if (this.transactions.length === 0) {
+                    return ["No transactions yet."];
+                } else {
+                    return ["Transaction History:", ...this.transactions];
+                }
+            }
+
+            takeLoan(amount, loanFeatureEnabled) {
+                if (!loanFeatureEnabled) {
+                    return { success: false, message: "Loan feature is currently disabled by the bank." };
+                }
+                if (amount <= 0) {
+                    return { success: false, message: "Loan amount must be positive." };
+                }
+                if (this.loanCount < 2) {
+                    this.balance += amount;
+                    this.loanCount += 1;
+                    this.transactions.push(`Loan taken: $${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+                    return { success: true, message: `Loan of $${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Successfully.` };
+                } else {
+                    return { success: false, message: "Loan Limit Exceeded. You can take at most two loans." };
+                }
+            }
+
+            transfer(recipientAccount, amount, isBankrupt) {
+                if (isBankrupt) {
+                    return { success: false, message: "The bank is bankrupt. Transfer not possible." };
+                }
+                if (amount <= 0) {
+                    return { success: false, message: "Transfer amount must be positive." };
+                }
+                if (amount > this.balance) {
+                    return { success: false, message: "Insufficient balance for the transfer." };
+                } else {
+                    this.balance -= amount;
+                    recipientAccount.balance += amount;
+                    this.transactions.push(`Transferred $${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} to ${recipientAccount.accountNumber}`);
+                    recipientAccount.transactions.push(`Received $${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} from ${this.accountNumber}`);
+                    return { success: true, message: `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} transferred to account number ${recipientAccount.accountNumber} Successfully.` };
+                }
+            }
+        }
+
+        class Bank {
+            constructor() {
+                console.log("Bank constructor called.");
+                this.accounts = {}; // Stores Account objects
+                this.loanFeatureEnabled = true;
+                this.bankrupt = false;
+                // Hardcoded admin credentials for demonstration
+                this.admins = [
+                    { username: "Tanbir", password: "123t" },
+                    { username: "Sami", password: "123s" },
+                    { username: "Akash", password: "123a" },
+                    { username: "Sume", password: "123s" }
+                ];
+
+                this.initializeFirebase();
+
+            }
+
+            async initializeFirebase() {
+                console.log("initializeFirebase() called.");
+                try {
+                    app = initializeApp(firebaseConfig);
+                    analytics = getAnalytics(app); // Initialize Analytics here
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    // Listen for auth state changes
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            isAuthReady = true;
+                            console.log("Firebase Auth ready. User ID:", userId);
+                            try {
+                                console.log("Calling loadAccounts()...");
+                                // Await loadAccounts to ensure this.accounts is populated
+                                await this.loadAccounts();
+                                console.log("loadAccounts() completed. Calling createInitialAccountsIfNeeded()...");
+                                // Now createInitialAccountsIfNeeded can safely run
+                                await this.createInitialAccountsIfNeeded();
+                                console.log("createInitialAccountsIfNeeded() completed.");
+                                showPanel('main-menu-panel'); // Show main menu after everything is loaded
+                            } catch (loadError) {
+                                console.error("Error loading accounts or creating initial accounts:", loadError);
+                                displayMessage("Failed to load banking data or create initial accounts. Check console for details.", "error", 'main-menu-panel');
+                            }
+                        } else {
+                            console.log("No user logged in. Attempting anonymous sign-in.");
+                            // If no user is logged in, try anonymous sign-in for localhost
+                            try {
+                                await signInAnonymously(auth);
+                                console.log("Anonymous sign-in successful.");
+                            } catch (error) {
+                                console.error("Error during anonymous sign-in:", error);
+                                displayMessage("Failed to authenticate. Please check your Firebase project's Authentication settings (Anonymous sign-in must be enabled).", "error", 'main-menu-panel');
+                            }
+                        }
+                    });
+
+                } catch (error) {
+                    console.error("Error initializing Firebase:", error);
+                    displayMessage("Failed to initialize banking system. Please check console and Firebase config.", "error", 'main-menu-panel');
+                }
+            }
+
+
+            async loadAccounts() {
+                console.log("loadAccounts() called.");
+                return new Promise(async (resolve, reject) => { // Wrap in a Promise
+                    if (!isAuthReady) {
+                        console.warn("Firebase Auth not ready. Skipping account load.");
+                        reject(new Error("Firebase Auth not ready.")); // Reject if not ready
+                        return;
+                    }
+                    showLoading();
+                    try {
+                        const accountsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/accounts`);
+
+                        // Use a flag to ensure the initial snapshot is handled
+                        let initialSnapshotHandled = false;
+
+                        const unsubscribe = onSnapshot(accountsCollectionRef, (snapshot) => {
+                            const loadedAccounts = {};
+                            snapshot.forEach(doc => {
+                                const data = doc.data();
+                                loadedAccounts[data.accountNumber] = Account.fromFirestore(data);
+                            });
+                            this.accounts = loadedAccounts;
+                            console.log("Accounts loaded/updated from Firestore:", this.accounts);
+                            hideLoading();
+                            displayMessage("Data synchronized with cloud.", "info", 'main-menu-panel');
+
+                            if (!initialSnapshotHandled) {
+                                initialSnapshotHandled = true;
+                                resolve(); // Resolve the promise after the initial data is loaded
+                            }
+                        }, (error) => {
+                            console.error("Error listening to accounts:", error);
+                            displayMessage("Failed to load accounts in real-time.", "error", 'main-menu-panel');
+                            hideLoading();
+                            if (!initialSnapshotHandled) { // Reject if error happens during initial load
+                                reject(error);
+                            }
+                        });
+
+                        // Load initial bank settings (loan feature, bankrupt status) with retry
+                        const bankSettingsDocRef = doc(db, `artifacts/${appId}/users/${userId}/bankSettings/main`);
+                        try {
+                            const docSnap = await retryOperation(async () => await getDoc(bankSettingsDocRef));
+                            if (docSnap.exists()) {
+                                const settings = docSnap.data();
+                                this.loanFeatureEnabled = settings.loanFeatureEnabled;
+                                this.bankrupt = settings.bankrupt;
+                                console.log("Bank settings loaded:", settings);
+                            } else {
+                                // Initialize default settings if they don't exist
+                                console.log("Bank settings document not found. Initializing default settings.");
+                                await setDoc(bankSettingsDocRef, {
+                                    loanFeatureEnabled: this.loanFeatureEnabled,
+                                    bankrupt: this.bankrupt
+                                });
+                                console.log("Default bank settings initialized.");
+                            }
+                        } catch (settingsError) {
+                            console.error(`Failed to load or initialize bank settings after multiple retries: ${settingsError.message}`);
+                            displayMessage("Failed to load bank settings from cloud.", "error", 'main-menu-panel');
+                            // Do not reject the main loadAccounts promise here, as account snapshot might still succeed.
+                        }
+
+                    } catch (error) {
+                        console.error("Error loading accounts or bank settings:", error);
+                        displayMessage("Failed to load data from cloud.", "error", 'main-menu-panel');
+                        hideLoading();
+                        reject(error); // Reject the promise on any critical error
+                    }
+                });
+            }
+
+            async saveAccount(account) {
+                if (!isAuthReady) {
+                    console.warn("Firestore not ready. Skipping account save.");
+                    displayMessage("System not ready. Please wait for Firebase initialization.", "error", 'admin-message-box'); // Changed target to admin-message-box
+                    return { success: false, message: "System not ready." };
+                }
+                showLoading();
+                try {
+                    const accountDocRef = doc(db, `artifacts/${appId}/users/${userId}/accounts`, account.accountNumber);
+                    await setDoc(accountDocRef, account.toFirestore());
+                    console.log(`Account ${account.accountNumber} saved to Firestore.`);
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error saving account:", error);
+                    displayMessage("Failed to save account data.", "error", 'admin-message-box');
+                    return { success: false, message: "Failed to save account data." };
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            async deleteAccountFromFirestore(accountNumber) {
+                if (!isAuthReady) {
+                    console.warn("Firestore not ready. Skipping account delete.");
+                    return { success: false, message: "System not ready." };
+                }
+                showLoading();
+                try {
+                    const accountDocRef = doc(db, `artifacts/${appId}/users/${userId}/accounts`, accountNumber);
+                    await deleteDoc(accountDocRef);
+                    console.log(`Account ${accountNumber} deleted from Firestore.`);
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error deleting account:", error);
+                    displayMessage("Failed to delete account data.", "error", 'admin-message-box');
+                    return { success: false, message: "Failed to delete account data." };
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            async saveBankSettings() {
+                if (!isAuthReady) {
+                    console.warn("Firestore not ready. Skipping settings save.");
+                    return { success: false, message: "System not ready." };
+                }
+                showLoading();
+                try {
+                    const bankSettingsDocRef = doc(db, `artifacts/${appId}/users/${userId}/bankSettings/main`);
+                    await setDoc(bankSettingsDocRef, {
+                        loanFeatureEnabled: this.loanFeatureEnabled,
+                        bankrupt: this.bankrupt
+                    });
+                    console.log("Bank settings saved to Firestore.");
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error saving bank settings:", error);
+                    displayMessage("Failed to save bank settings.", "error", 'admin-message-box');
+                    return { success: false, message: "Failed to save bank settings." };
+                } finally {
+                    hideLoading();
+                }
+            }
+
+
+            async createAccount(name, email, address, accountType, password, initialBalance) { // Added initialBalance
+                const accountNumber = name + email;
+                if (this.accounts[accountNumber]) {
+                    return { success: false, message: "Account with this name and email already exists." };
+                }
+                const account = new Account(name, email, address, accountType, password, initialBalance); // Pass initialBalance
+                const saveResult = await this.saveAccount(account);
+
+                if (saveResult.success) {
+                    // this.accounts will be updated by onSnapshot listener
+                    return { success: true, message: `Account created successfully with account number: ${account.accountNumber}`, account: account };
+                } else {
+                    return saveResult; // Pass along the error message from saveAccount
+                }
+            }
+
+
+            getAccount(accountNumber) {
+                return this.accounts[accountNumber];
+            }
+
+            accountCheck(accountNum) {
+                return accountNum in this.accounts;
+            }
+
+            async deleteAccount(accountNumber) {
+                if (this.accountCheck(accountNumber)) {
+                    const deleteResult = await this.deleteAccountFromFirestore(accountNumber);
+                    if (deleteResult.success) {
+                        // this.accounts will be updated by onSnapshot listener
+                        return { success: true, message: `Account ${accountNumber} deleted successfully.` };
+                    } else {
+                        return deleteResult;
+                    }
+                } else {
+                    return { success: false, message: "Account not found." };
+                }
+            }
+
+            listAccounts() {
+                if (Object.keys(this.accounts).length === 0) {
+                    return ["No Account Available."];
+                } else {
+                    return ["List of all User Accounts:", ...Object.values(this.accounts).map(account =>
+                        `Account Number: ${account.accountNumber}, Name: ${account.name}, Balance: $${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    )];
+                }
+            }
+
+            checkTotalBalance() {
+                const totalBalance = Object.values(this.accounts).reduce((sum, account) => sum + account.balance, 0);
+                return `Total balance in the bank: $${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+
+            checkTotalLoans() {
+                const totalLoans = Object.values(this.accounts).reduce((sum, account) => sum + account.loanCount, 0);
+                return `Total loans taken: ${totalLoans}`;
+            }
+
+            async enableDisableLoanFeature(status) {
+                this.loanFeatureEnabled = status;
+                const saveResult = await this.saveBankSettings();
+                if (saveResult.success) {
+                    return { success: true, message: `Loan feature ${status ? 'enabled' : 'disabled'}.` };
+                } else {
+                    return saveResult;
+                }
+            }
+
+            async setBankruptStatus(status) {
+                this.bankrupt = status;
+                const saveResult = await this.saveBankSettings();
+                if (saveResult.success) {
+                    return { success: true, message: `Bank is now ${status ? 'bankrupt' : 'operational'}.` };
+                } else {
+                    return saveResult;
+                }
+            }
+
+            adminLogin(username, password) {
+                // Check against multiple admin credentials
+                const foundAdmin = this.admins.find(admin => admin.username === username && admin.password === password);
+                if (foundAdmin) {
+                    return { success: true, message: "Admin login successful!" };
+                } else {
+                    return { success: false, message: "Invalid admin username or password." };
+                }
+            }
+        }
+
+        const bank = new Bank();
+        // loggedInUserAccount is no longer needed as there's no dedicated user panel
+        // let loggedInUserAccount = null; 
+
+        // --- Event Listeners and UI Logic ---
+
+        // Main Menu Buttons
+        getElement('admin-login-btn').addEventListener('click', () => {
+            showModal(
+                "Admin Login",
+                `
+                <div class="input-group">
+                    <label for="admin-username">Username:</label>
+                    <input type="text" id="admin-username" class="w-full p-2 border rounded" placeholder="Enter admin username">
+                </div>
+                <div class="input-group">
+                    <label for="admin-password">Password:</label>
+                    <input type="password" id="admin-password" class="w-full p-2 border rounded" placeholder="Enter admin password">
+                </div>
+                `,
+                () => {
+                    const username = getElement('admin-username').value.trim();
+                    const password = getElement('admin-password').value.trim();
+                    const result = bank.adminLogin(username, password);
+                    if (result.success) {
+                        displayMessage(result.message, "success", 'main-menu-panel');
+                        showPanel('admin-panel');
+                    } else {
+                        displayMessage(result.message, "error", 'main-menu-panel');
+                    }
+                }
+            );
+        });
+
+        // Removed user-login-btn event listener as the button is removed from HTML
+
+        getElement('exit-btn').addEventListener('click', () => {
+            displayMessage("Bank Shut Down. Goodbye!", "info", 'main-menu-panel');
+            setTimeout(() => {
+                console.log("Application exited.");
+            }, 2000);
+        });
+
+        // Admin Panel Buttons
+        getElement('admin-back-btn').addEventListener('click', () => showPanel('main-menu-panel'));
+
+        getElement('admin-create-account-btn').addEventListener('click', async () => { // Made async
+            showModal(
+                "Create New Account",
+                `
+                <div class="input-group">
+                    <label for="modal-name">Name:</label>
+                    <input type="text" id="modal-name" class="w-full p-2 border rounded" placeholder="Enter name">
+                </div>
+                <div class="input-group">
+                    <label for="modal-email">Email:</label>
+                    <input type="email" id="modal-email" class="w-full p-2 border rounded" placeholder="Enter email">
+                </div>
+                <div class="input-group">
+                    <label for="modal-address">Address:</label>
+                    <input type="text" id="modal-address" class="w-full p-2 border rounded" placeholder="Enter address">
+                </div>
+                <div class="input-group">
+                    <label for="modal-account-type">Account Type:</label>
+                    <select id="modal-account-type" class="w-full p-2 border rounded">
+                        <option value="Savings">Savings</option>
+                        <option value="Current">Current</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="modal-password">Password:</label>
+                    <input type="password" id="modal-password" class="w-full p-2 border rounded" placeholder="Set account password">
+                </div>
+                <div class="input-group">
+                    <label for="modal-initial-balance">Initial Balance ($):</label>
+                    <input type="number" id="modal-initial-balance" class="w-full p-2 border rounded" value="0" min="0" step="0.01">
+                </div>
+                `,
+                async () => { // Made async
+                    const name = getElement('modal-name').value.trim();
+                    const email = getElement('modal-email').value.trim();
+                    const address = getElement('modal-address').value.trim();
+                    const accountType = getElement('modal-account-type').value;
+                    const password = getElement('modal-password').value.trim();
+                    const initialBalance = parseFloat(getElement('modal-initial-balance').value);
+
+                    if (!name || !email || !address || !password) {
+                        displayMessage("All fields are required.", "error", 'admin-message-box');
+                        return;
+                    }
+                    if (isNaN(initialBalance) || initialBalance < 0) {
+                        displayMessage("Initial balance must be a non-negative number.", "error", 'admin-message-box');
+                        return;
+                    }
+
+                    const result = await bank.createAccount(name, email, address, accountType, password, initialBalance); // Pass initialBalance
+                    if (result.success) {
+                        displayMessage(result.message, "success", 'admin-message-box');
+                    } else {
+                        displayMessage(result.message, "error", 'admin-message-box');
+                    }
+                }
+            );
+        });
+
+        getElement('admin-delete-account-btn').addEventListener('click', () => {
+            showModal(
+                "Delete Account",
+                `
+                <div class="input-group">
+                    <label for="modal-account-num">Account Number:</label>
+                    <input type="text" id="modal-account-num" class="w-full p-2 border rounded" placeholder="Enter account number to delete">
+                </div>
+                `,
+                async () => { // Made async
+                    const accountNum = getElement('modal-account-num').value.trim();
+                    if (!accountNum) {
+                        displayMessage("Account number is required.", "error", 'admin-message-box');
+                        return;
+                    }
+                    const result = await bank.deleteAccount(accountNum);
+                    if (result.success) {
+                        displayMessage(result.message, "success", 'admin-message-box');
+                    } else {
+                        displayMessage(result.message, "error", 'admin-message-box');
+                    }
+                }
+            );
+        });
+
+        getElement('admin-list-accounts-btn').addEventListener('click', () => {
+            const accountsList = bank.listAccounts();
+            displayListOutput(accountsList, 'admin-output-area');
+            displayMessage("Accounts listed successfully.", "info", 'admin-message-box');
+        });
+
+        getElement('admin-total-balance-btn').addEventListener('click', () => {
+            const totalBalance = bank.checkTotalBalance();
+            displayMessage(totalBalance, "info", 'admin-message-box');
+        });
+
+        getElement('admin-total-loans-btn').addEventListener('click', () => {
+            const totalLoans = bank.checkTotalLoans();
+            displayMessage(totalLoans, "info", 'admin-message-box');
+        });
+
+        getElement('admin-toggle-loan-btn').addEventListener('click', () => {
+            showModal(
+                "Toggle Loan Feature",
+                `
+                <div class="input-group">
+                    <label for="modal-loan-status">Loan Feature Status:</label>
+                    <select id="modal-loan-status" class="w-full p-2 border rounded">
+                        <option value="enable">Enable</option>
+                        <option value="disable">Disable</option>
+                    </select>
+                </div>
+                `,
+                async () => { // Made async
+                    const status = getElement('modal-loan-status').value === 'enable';
+                    const result = await bank.enableDisableLoanFeature(status);
+                    if (result.success) {
+                        displayMessage(result.message, "success", 'admin-message-box');
+                    } else {
+                        displayMessage(result.message, "error", 'admin-message-box');
+                    }
+                }
+            );
+        });
+
+        getElement('admin-bankrupt-btn').addEventListener('click', () => {
+            showModal(
+                "Declare Bank Bankrupt",
+                `
+                <p>Are you sure you want to declare the bank bankrupt? This will disable withdrawals and transfers for users.</p>
+                <div class="input-group mt-4">
+                    <label for="modal-bankrupt-confirm">Type 'BANKRUPT' to confirm:</label>
+                    <input type="text" id="modal-bankrupt-confirm" class="w-full p-2 border rounded" placeholder="BANKRUPT">
+                </div>
+                `,
+                async () => { // Made async
+                    const confirmation = getElement('modal-bankrupt-confirm').value.trim();
+                    if (confirmation === 'BANKRUPT') {
+                        const result = await bank.setBankruptStatus(true);
+                        if (result.success) {
+                            displayMessage(result.message, "success", 'admin-message-box');
+                            // Removed the user-message-box notification as it no longer exists
+                        } else {
+                            displayMessage(result.message, "error", 'admin-message-box');
+                        }
+                    } else {
+                        displayMessage("Confirmation failed. Bankrupt status not changed.", "error", 'admin-message-box');
+                    }
+                }
+            );
+        });
+
+
+        // --- Admin-controlled User Actions ---
+
+        getElement('admin-deposit-btn').addEventListener('click', async () => {
+            showModal(
+                "Deposit Funds for User",
+                `
+                <div class="input-group">
+                    <label for="modal-target-account-num-deposit">Target Account Number:</label>
+                    <input type="text" id="modal-target-account-num-deposit" class="w-full p-2 border rounded" placeholder="Enter user's account number">
+                </div>
+                <div class="input-group">
+                    <label for="modal-amount-deposit">Amount:</label>
+                    <input type="number" id="modal-amount-deposit" class="w-full p-2 border rounded" placeholder="Enter amount to deposit">
+                </div>
+                `,
+                async () => {
+                    const targetAccountNum = getElement('modal-target-account-num-deposit').value.trim();
+                    const amount = parseFloat(getElement('modal-amount-deposit').value);
+
+                    if (!targetAccountNum) {
+                        displayMessage("Target account number is required.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    if (isNaN(amount) || amount <= 0) {
+                        displayMessage("Please enter a valid positive amount.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const targetAccount = bank.getAccount(targetAccountNum);
+                    if (!targetAccount) {
+                        displayMessage("Target account not found.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const result = targetAccount.deposit(amount);
+                    if (result.success) {
+                        const saveResult = await bank.saveAccount(targetAccount);
+                        if (saveResult.success) {
+                            displayMessage(result.message, "admin-user-action-success", 'admin-message-box');
+                        } else {
+                            displayMessage("Deposit successful, but failed to save data to cloud.", "admin-user-action-error", 'admin-message-box');
+                        }
+                    } else {
+                        displayMessage(result.message, "admin-user-action-error", 'admin-message-box');
+                    }
+                }
+            );
+        });
+
+        getElement('admin-withdraw-btn').addEventListener('click', async () => {
+            showModal(
+                "Withdraw Funds for User",
+                `
+                <div class="input-group">
+                    <label for="modal-target-account-num-withdraw">Target Account Number:</label>
+                    <input type="text" id="modal-target-account-num-withdraw" class="w-full p-2 border rounded" placeholder="Enter user's account number">
+                </div>
+                <div class="input-group">
+                    <label for="modal-amount-withdraw">Amount:</label>
+                    <input type="number" id="modal-amount-withdraw" class="w-full p-2 border rounded" placeholder="Enter amount to withdraw">
+                </div>
+                `,
+                async () => {
+                    const targetAccountNum = getElement('modal-target-account-num-withdraw').value.trim();
+                    const amount = parseFloat(getElement('modal-amount-withdraw').value);
+
+                    if (!targetAccountNum) {
+                        displayMessage("Target account number is required.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    if (isNaN(amount) || amount <= 0) {
+                        displayMessage("Please enter a valid positive amount.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const targetAccount = bank.getAccount(targetAccountNum);
+                    if (!targetAccount) {
+                        displayMessage("Target account not found.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const result = targetAccount.withdraw(amount, bank.bankrupt);
+                    if (result.success) {
+                        const saveResult = await bank.saveAccount(targetAccount);
+                        if (saveResult.success) {
+                            displayMessage(result.message, "admin-user-action-success", 'admin-message-box');
+                        } else {
+                            displayMessage("Withdrawal successful, but failed to save data to cloud.", "admin-user-action-error", 'admin-message-box');
+                        }
+                    } else {
+                        displayMessage(result.message, "admin-user-action-error", 'admin-message-box');
+                    }
+                }
+            );
+        });
+
+        getElement('admin-check-balance-btn').addEventListener('click', () => {
+            showModal(
+                "Check User Balance",
+                `
+                <div class="input-group">
+                    <label for="modal-target-account-num-balance">Target Account Number:</label>
+                    <input type="text" id="modal-target-account-num-balance" class="w-full p-2 border rounded" placeholder="Enter user's account number">
+                </div>
+                `,
+                () => {
+                    const targetAccountNum = getElement('modal-target-account-num-balance').value.trim();
+                    if (!targetAccountNum) {
+                        displayMessage("Target account number is required.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const targetAccount = bank.getAccount(targetAccountNum);
+                    if (!targetAccount) {
+                        displayMessage("Target account not found.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    displayMessage(targetAccount.checkBalance(), "admin-user-action-info", 'admin-message-box');
+                }
+            );
+        });
+
+        getElement('admin-transaction-history-btn').addEventListener('click', () => {
+            showModal(
+                "View User Transaction History",
+                `
+                <div class="input-group">
+                    <label for="modal-target-account-num-history">Target Account Number:</label>
+                    <input type="text" id="modal-target-account-num-history" class="w-full p-2 border rounded" placeholder="Enter user's account number">
+                </div>
+                `,
+                () => {
+                    const targetAccountNum = getElement('modal-target-account-num-history').value.trim();
+                    if (!targetAccountNum) {
+                        displayMessage("Target account number is required.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const targetAccount = bank.getAccount(targetAccountNum);
+                    if (!targetAccount) {
+                        displayMessage("Target account not found.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    const history = targetAccount.transactionHistory();
+                    displayListOutput(history, 'admin-output-area');
+                    displayMessage("Transaction history displayed.", "admin-user-action-info", 'admin-message-box');
+                }
+            );
+        });
+
+        getElement('admin-take-loan-btn').addEventListener('click', async () => {
+            showModal(
+                "Grant Loan to User",
+                `
+                <div class="input-group">
+                    <label for="modal-target-account-num-loan">Target Account Number:</label>
+                    <input type="text" id="modal-target-account-num-loan" class="w-full p-2 border rounded" placeholder="Enter user's account number">
+                </div>
+                <div class="input-group">
+                    <label for="modal-amount-loan">Loan Amount:</label>
+                    <input type="number" id="modal-amount-loan" class="w-full p-2 border rounded" placeholder="Enter loan amount">
+                </div>
+                `,
+                async () => {
+                    const targetAccountNum = getElement('modal-target-account-num-loan').value.trim();
+                    const amount = parseFloat(getElement('modal-amount-loan').value);
+
+                    if (!targetAccountNum) {
+                        displayMessage("Target account number is required.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    if (isNaN(amount) || amount <= 0) {
+                        displayMessage("Please enter a valid positive amount.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const targetAccount = bank.getAccount(targetAccountNum);
+                    if (!targetAccount) {
+                        displayMessage("Target account not found.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const result = targetAccount.takeLoan(amount, bank.loanFeatureEnabled);
+                    if (result.success) {
+                        const saveResult = await bank.saveAccount(targetAccount);
+                        if (saveResult.success) {
+                            displayMessage(result.message, "admin-user-action-success", 'admin-message-box');
+                        } else {
+                            displayMessage("Loan granted, but failed to save data to cloud.", "admin-user-action-error", 'admin-message-box');
+                        }
+                    } else {
+                        displayMessage(result.message, "admin-user-action-error", 'admin-message-box');
+                    }
+                }
+            );
+        });
+        getElement('admin-transfer-btn').addEventListener('click', async () => {
+            showModal(
+                "Transfer Funds (Admin Initiated)",
+                `
+                <div class="input-group">
+                    <label for="modal-from-account-num-transfer">Sender Account Number:</label>
+                    <input type="text" id="modal-from-account-num-transfer" class="w-full p-2 border rounded" placeholder="Enter sender's account number">
+                </div>
+                <div class="input-group">
+                    <label for="modal-to-account-num-transfer">Recipient Account Number:</label>
+                    <input type="text" id="modal-to-account-num-transfer" class="w-full p-2 border rounded" placeholder="Enter recipient's account number">
+                </div>
+                <div class="input-group">
+                    <label for="modal-amount-transfer">Amount to Transfer:</label>
+                    <input type="number" id="modal-amount-transfer" class="w-full p-2 border rounded" placeholder="Enter amount to transfer">
+                </div>
+                `,
+                async () => {
+                    const fromAccountNum = getElement('modal-from-account-num-transfer').value.trim();
+                    const toAccountNum = getElement('modal-to-account-num-transfer').value.trim();
+                    const amount = parseFloat(getElement('modal-amount-transfer').value);
+
+                    if (!fromAccountNum || !toAccountNum) {
+                        displayMessage("Sender and Recipient account numbers are required.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    if (isNaN(amount) || amount <= 0) {
+                        displayMessage("Please enter a valid positive amount.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+
+                    const fromAccount = bank.getAccount(fromAccountNum);
+                    const toAccount = bank.getAccount(toAccountNum);
+                    if (!fromAccount) {
+                        displayMessage("Sender account not found.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    if (!toAccount) {
+                        displayMessage("Recipient account not found.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    if (fromAccount.accountNumber === toAccountNum) {
+                        displayMessage("Cannot transfer to the same account.", "admin-user-action-error", 'admin-message-box');
+                        return;
+                    }
+                    const result = fromAccount.transfer(toAccount, amount, bank.bankrupt);
+                    if (result.success) {
+                        const saveFromAccountResult = await bank.saveAccount(fromAccount);
+                        const saveToAccountResult = await bank.saveAccount(toAccount);
+
+                        if (saveFromAccountResult.success && saveToAccountResult.success) {
+                            displayMessage(result.message, "admin-user-action-success", 'admin-message-box');
+                        } else {
+                            displayMessage("Transfer successful, but failed to save data to cloud.", "admin-user-action-error", 'admin-message-box');
+                        }
+                    } else {
+                        displayMessage(result.message, "admin-user-action-error", 'admin-message-box');
+                    }
+                }
+            );
+        });
+
+    </script>
+</body>
+
+</html>
